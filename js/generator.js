@@ -12,16 +12,17 @@ var buildGraph = function( text, p ) {
   
   // draw the graph
   _.each( languageData.languageName, function( name, langIndex ) {
-    p.fill( 194, 0, 83, 25 );
+    p.fill( 194, 0, 83, 50 );
     p.stroke( 255, 25 );
     p.beginShape();
-    p.vertex( 0, h );
+    p.vertex( 0, h/2 );
+    p.vertex( 0, h/2 );
     _.each( text, function( letter, index ) {
-      p.ellipse( step*index, h-getFrequency(letter,langIndex)/max*h, 10, 10 );
-      p.vertex( step*index, h-getFrequency(letter,langIndex)/max*h );
+      //p.ellipse( step*index, h-getFrequency(letter,langIndex)/max*h/2, 10, 10 );
+      p.curveVertex( step*index, h/2+getFrequency(letter,langIndex)/max*h/2*(1-(langIndex%2)*2) );
     });
-    p.vertex( w, h );
-    p.vertex( 0, h );
+    p.vertex( w, h/2 );
+    p.vertex( 0, h/2 );
     p.endShape();
   });
 }
@@ -69,7 +70,7 @@ var maxPercentage = function( text, language ) {
  **/
 var proc = new Processing( canvas, function( p ) {
     p.setup = function() {
-      p.size( 600, 600 );
+      p.size( 1200, 600 );
       p.background( 250 );
     }
     
