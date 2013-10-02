@@ -27,7 +27,8 @@ var Point = function( x, y, letter ) {
 /***
  * Represent one language of the point graph
  **/
-var PointSet = function() {
+var PointSet = function( color ) {
+  this.color = color;
   this.allPoints = [];
   var self = this;
   this.empty = function() {
@@ -79,51 +80,29 @@ var AllPoints = {
   },
   init: function() {
     _.each( languageData.languageName, function( item, index ) {
-      AllPoints.sets.push( new PointSet() );
+      var col = { r:194, g:0, b:83 };
+      if ( index % 2 === 0 ) {
+        col = { r:118, g:151, b:152 };
+      }
+      AllPoints.sets.push( new PointSet( col ) );
     });
   }
 };
 
 
-/***
- * Draw a graph of all points (once)
- **/
-var buildGraph = function( text, p ) {
-  text = text.toLowerCase();
-  var w = p.width,
-      h = p.height;
-  var step = w / text.length;
-  var max = maxPercentage( text );
-  
-  // draw the graph
-  _.each( languageData.languageName, function( name, langIndex ) {
-    p.fill( 194, 0, 83, 50 );
-    p.stroke( 255, 25 );
-    p.beginShape();
-    p.vertex( 0, h/2 );
-    p.vertex( 0, h/2 );
-    _.each( text, function( letter, index ) {
-      //p.ellipse( step*index, h-getFrequency(letter,langIndex)/max*h/2, 10, 10 );
-      p.vertex( step*index, h/2+getFrequency(letter,langIndex)/max*h/2*(1-(langIndex%2)*2) );
-    });
-    p.vertex( w, h/2 );
-    p.vertex( 0, h/2 );
-    p.endShape();
-  });
-}
 
 var drawPoints = function( p ) {
   var w = p.width,
       h = p.height;
   _.each( AllPoints.sets, function( set ) {
-    p.fill( 194, 0, 83, 50 );
+    p.fill( set.color.r, set.color.g, set.color.b, 50 );
     p.stroke( 255, 25 );
     p.beginShape();
     p.vertex( 0, h/2 );
     p.vertex( 0, h/2 );
     _.each( set.allPoints, function( point ) {
-      p.vertex( point.x, point.y )
-      p.ellipse( point.x, point.y, 10, 10 );
+      p.curveVertex( point.x, point.y )
+    //  p.ellipse( point.x, point.y, 10, 10 );
     });
     p.vertex( w, h/2 );
     p.vertex( 0, h/2 );
