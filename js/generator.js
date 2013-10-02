@@ -192,7 +192,7 @@ var proc = new Processing( canvas, function( p ) {
 AllPoints.layout( theText, 1200, 600 );
 
 $(document).ready( function() {
-  $('#textbox').on( 'keydown', function( e ) {
+  $('#textbox').on( 'keyup', function( e ) {
     console.log( "changed" );
     var val = $(e.currentTarget).val();
     AllPoints.layout( val, 1200, 600 );
