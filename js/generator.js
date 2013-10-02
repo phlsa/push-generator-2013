@@ -1,14 +1,14 @@
 var canvas = document.getElementById( 'canv' );
 var ctx = canv.getContext( '2d' );
 
-var theText = "hello";
+var theText = "";
 
 /***
  * Definition of one point
  **/
 var Point = function( x, y, letter ) {
   var self = this;
-  this.x = 1000;
+  this.x = 1200;
   this.y = 300;
   this.destX = x;
   this.destY = y;
@@ -122,7 +122,7 @@ var drawPoints = function( p ) {
     p.vertex( 0, h/2 );
     p.vertex( 0, h/2 );
     _.each( set.allPoints, function( point ) {
-      p.curveVertex( point.x, point.y )
+      p.vertex( point.x, point.y )
       p.ellipse( point.x, point.y, 10, 10 );
     });
     p.vertex( w, h/2 );
@@ -190,3 +190,11 @@ var proc = new Processing( canvas, function( p ) {
 });
 
 AllPoints.layout( theText, 1200, 600 );
+
+$(document).ready( function() {
+  $('#textbox').on( 'keydown', function( e ) {
+    console.log( "changed" );
+    var val = $(e.currentTarget).val();
+    AllPoints.layout( val, 1200, 600 );
+  });
+});
