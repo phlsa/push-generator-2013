@@ -44,13 +44,18 @@ var PointSet = function() {
     }
   };
   this.layout = function( text, langIndex, w, h, max, step ) {
+    var counter = 0;
     _.each( text, function( letter, index ) {
       if ( self.get( index ) === undefined ) {
         self.add( step*index, h/2+getFrequency(letter,langIndex)/max*h/2*(1-(langIndex%2)*2) );
       } else {
         self.get( index ).moveTo( step*index, h/2+getFrequency(letter,langIndex)/max*h/2*(1-(langIndex%2)*2) );
       }
+      counter++;
     });
+    if ( counter < self.allPoints.length ) {
+      self.allPoints.splice( counter-1, self.allPoints.length );
+    }
   };
 }
 
@@ -115,13 +120,13 @@ var drawPoints = function( p ) {
     p.stroke( 255, 25 );
     p.beginShape();
     p.vertex( 0, h/2 );
-    //p.vertex( 0, h/2 );
+    p.vertex( 0, h/2 );
     _.each( set.allPoints, function( point ) {
-      p.vertex( point.x, point.y )
+      p.curveVertex( point.x, point.y )
       p.ellipse( point.x, point.y, 10, 10 );
     });
     p.vertex( w, h/2 );
-    //p.vertex( 0, h/2 );
+    p.vertex( 0, h/2 );
     p.endShape();
   });
 }
