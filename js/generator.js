@@ -55,7 +55,7 @@ var PointSet = function( color ) {
       counter++;
     });
     if ( counter < self.allPoints.length ) {
-      self.allPoints.splice( counter-1, self.allPoints.length );
+      self.allPoints.splice( counter, self.allPoints.length );
     }
   };
 }
@@ -79,11 +79,13 @@ var AllPoints = {
     });
   },
   init: function() {
+    //var col = { r:Math.random()*255, g:Math.random()*255, b:Math.random()*255 };
     _.each( languageData.languageName, function( item, index ) {
       var col = { r:194, g:0, b:83 };
-      if ( index % 2 === 0 ) {
-        col = { r:118, g:151, b:152 };
-      }
+      /*if ( index % 2 === 0 ) {
+        //col = { r:118, g:151, b:152 };
+        col = { r:Math.random()*255, g:Math.random()*255, b:Math.random()*255 };
+      }*/
       AllPoints.sets.push( new PointSet( col ) );
     });
   }
@@ -96,7 +98,7 @@ var drawPoints = function( p ) {
       h = p.height;
   _.each( AllPoints.sets, function( set ) {
     p.fill( set.color.r, set.color.g, set.color.b, 50 );
-    p.stroke( 255, 25 );
+    p.stroke( 118, 151, 152, 150 );
     p.beginShape();
     p.vertex( 0, h/2 );
     p.vertex( 0, h/2 );
@@ -162,7 +164,6 @@ var proc = new Processing( canvas, function( p ) {
       ctx.globalCompositeOperation = 'copy';
       p.background( 51 );
       ctx.globalCompositeOperation = 'lighter';
-      //buildGraph( theText, p );
       AllPoints.move();
       drawPoints( p );
     }
@@ -172,8 +173,7 @@ AllPoints.layout( theText, 1200, 600 );
 
 $(document).ready( function() {
   $('#textbox').on( 'keyup', function( e ) {
-    console.log( "changed" );
-    var val = $(e.currentTarget).val();
-    AllPoints.layout( val, 1200, 600 );
+      var val = $(e.currentTarget).val();
+      AllPoints.layout( val, 1200, 600 );
   });
 });
