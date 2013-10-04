@@ -170,7 +170,7 @@ $(document).ready( function() {
       p.background( 250 );
       AllPoints.init();
       processing = p;
-      AllPoints.layout( "", w, 600 );
+      AllPoints.layout( $('#generator-input').val(), w, 600 );
     }
     
     p.draw = function() {
