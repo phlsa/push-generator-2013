@@ -7,16 +7,18 @@
 	<script src="js/processing.js"></script>
 	<script src="js/underscore.min.js"></script>
 	<script src="js/languageData.js"></script>
+	<link rel="stylesheet" type="text/css" href="css/generator.css">
 </head>
 <body>
 
-<canvas id="canv"></canvas>
-<div>
-	<ul id="language-list">
-
-	</ul>
+<div class="generator-main">
+	<canvas id="canv"></canvas>
+	<div class="generator-language-list">
+		<input type="text" id="generator-input">
+		<div>Move your mouse over the languages to highlight them</div>
+		<ul id="language-list"></ul>
+	</div>
+	<script src="js/generator.js"></script>
 </div>
-<input type="text" id="textbox">
-<script src="js/generator.js"></script>
 </body>
 </html>

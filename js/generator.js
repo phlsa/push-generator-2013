@@ -2,7 +2,7 @@ var canvas = document.getElementById( 'canv' );
 var ctx = canv.getContext( '2d' );
 
 var state = {
-  highlight: -1
+  highlight: -1,
 }
 var processing;
 
@@ -22,9 +22,10 @@ var Point = function( x, y, letter ) {
     self.destY = y;
   }
   this.move = function() {
-    var offset = processing.noise( self.noiseSeed + (processing.frameCount)/300 ) * 6 - 3;
-    self.x += (self.destX - self.x) / 5;
-    self.y += (self.destY - self.y) / 8 + offset;
+    var offsetX = processing.noise( self.noiseSeed + (processing.frameCount)/300 ) * 16 - 8;
+    var offsetY = processing.noise( self.noiseSeed*2 + (processing.frameCount)/300 ) * 6 - 3;
+    self.x += (self.destX - self.x) / 5 + offsetX;
+    self.y += (self.destY - self.y) / 8 + offsetY;
   }
 }
 
@@ -156,15 +157,20 @@ var maxPercentage = function( text, language ) {
   }
 }
 
-/***
- * Create Processing instance
- **/
-var proc = new Processing( canvas, function( p ) {
+
+
+$(document).ready( function() {
+  /***
+   * Create Processing instance
+   **/
+  var proc = new Processing( canvas, function( p ) {
     p.setup = function() {
-      p.size( 1200, 600 );
+      var w = $('.generator-main').width();
+      p.size( w, 600 );
       p.background( 250 );
       AllPoints.init();
       processing = p;
+      AllPoints.layout( "", w, 600 );
     }
     
     p.draw = function() {
@@ -174,15 +180,15 @@ var proc = new Processing( canvas, function( p ) {
       AllPoints.move();
       drawPoints( p );
     }
-});
+  });
 
-AllPoints.layout( "", 1200, 600 );
-
-$(document).ready( function() {
-  $('#textbox').on( 'keyup', function( e ) {
+  /***
+   * Bind handlers
+   **/
+  $('#generator-input').on( 'keyup', function( e ) {
       var val = $(e.currentTarget).val();
       AllPoints.layout( val, 1200, 600 );
-  });
+  }).focus();
 
   _.each( languageData.languageName, function( item, index ) {
     var elem = $('<li data-index="'+index+'">'+item+'</li>');
