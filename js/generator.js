@@ -4,6 +4,7 @@ var ctx = canv.getContext( '2d' );
 var state = {
   highlight: -1
 }
+var processing;
 
 /***
  * Definition of one point
@@ -15,13 +16,15 @@ var Point = function( x, y, letter ) {
   this.destX = x;
   this.destY = y;
   this.letter = letter;
+  this.noiseSeed = Math.random()*10;
   this.moveTo = function( x, y ) {
     self.destX = x;
     self.destY = y;
   }
   this.move = function() {
+    var offset = processing.noise( self.noiseSeed + (processing.frameCount)/300 ) * 6 - 3;
     self.x += (self.destX - self.x) / 5;
-    self.y += (self.destY - self.y) / 8;
+    self.y += (self.destY - self.y) / 8 + offset;
   }
 }
 
@@ -161,6 +164,7 @@ var proc = new Processing( canvas, function( p ) {
       p.size( 1200, 600 );
       p.background( 250 );
       AllPoints.init();
+      processing = p;
     }
     
     p.draw = function() {
