@@ -1,7 +1,9 @@
 var canvas = document.getElementById( 'canv' );
 var ctx = canv.getContext( '2d' );
 
-var theText = "";
+var state = {
+  highlight: -1
+}
 
 /***
  * Definition of one point
@@ -79,13 +81,8 @@ var AllPoints = {
     });
   },
   init: function() {
-    //var col = { r:Math.random()*255, g:Math.random()*255, b:Math.random()*255 };
     _.each( languageData.languageName, function( item, index ) {
       var col = { r:194, g:0, b:83 };
-      /*if ( index % 2 === 0 ) {
-        //col = { r:118, g:151, b:152 };
-        col = { r:Math.random()*255, g:Math.random()*255, b:Math.random()*255 };
-      }*/
       AllPoints.sets.push( new PointSet( col ) );
     });
   }
@@ -96,9 +93,15 @@ var AllPoints = {
 var drawPoints = function( p ) {
   var w = p.width,
       h = p.height;
-  _.each( AllPoints.sets, function( set ) {
+  _.each( AllPoints.sets, function( set, index ) {
     p.fill( set.color.r, set.color.g, set.color.b, 50 );
-    p.stroke( 118, 151, 152, 150 );
+    if ( index === state.highlight ) {
+      p.strokeWeight( 4 );
+      p.stroke( 118, 151, 152 );
+    } else {
+      p.strokeWeight( 1 );
+      p.stroke( 118, 151, 152, 150 );
+    }
     p.beginShape();
     p.vertex( 0, h/2 );
     p.vertex( 0, h/2 );
@@ -169,11 +172,21 @@ var proc = new Processing( canvas, function( p ) {
     }
 });
 
-AllPoints.layout( theText, 1200, 600 );
+AllPoints.layout( "", 1200, 600 );
 
 $(document).ready( function() {
   $('#textbox').on( 'keyup', function( e ) {
       var val = $(e.currentTarget).val();
       AllPoints.layout( val, 1200, 600 );
+  });
+
+  _.each( languageData.languageName, function( item, index ) {
+    var elem = $('<li data-index="'+index+'">'+item+'</li>');
+    elem.on( 'mouseenter', function( e ) {
+      state.highlight = parseInt( $(e.currentTarget).attr('data-index') );
+    }).on( 'mouseleave', function( e ) {
+      state.highlight = -1;
+    });
+    $('#language-list').append( elem );
   });
 });
