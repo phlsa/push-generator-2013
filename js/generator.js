@@ -97,17 +97,23 @@ var AllPoints = {
 
 
 
-var drawPoints = function( p ) {
+var drawPoints = function( p, black ) {
   var w = p.width,
       h = p.height;
   _.each( AllPoints.sets, function( set, index ) {
-    p.fill( set.color.r, set.color.g, set.color.b, 50 );
-    if ( index === state.highlight ) {
-      p.strokeWeight( 4 );
-      p.stroke( 118, 151, 152 );
-    } else {
+    if ( black ) {
+      p.fill( 50 );
+      p.stroke( 50 );
       p.strokeWeight( 1 );
-      p.stroke( 118, 151, 152, 150 );
+    } else {
+      p.fill( set.color.r, set.color.g, set.color.b, 50 );
+      if ( index === state.highlight ) {
+        p.strokeWeight( 4 );
+        p.stroke( 118, 151, 152 );
+      } else {
+        p.strokeWeight( 1 );
+        p.stroke( 118, 151, 152, 150 );
+      }
     }
     p.beginShape();
     p.vertex( 0, h/2 );
@@ -211,8 +217,10 @@ $(document).ready( function() {
     
     p.draw = function() {
       ctx.clearRect( 0, 0, p.width, p.height );
-      ctx.globalCompositeOperation = 'lighter';
+      ctx.globalCompositeOperation = 'source-over';
       AllPoints.move();
+      drawPoints( p, true );
+      ctx.globalCompositeOperation = 'lighter';
       drawPoints( p );
     }
   });
