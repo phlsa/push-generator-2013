@@ -201,10 +201,11 @@ $(document).ready( function() {
   var proc = new Processing( canvas, function( p ) {
     p.setup = function() {
       var w = $('.generator-main').width();
-      p.size( w, 600 );
+      var h = $('.generator-main').height();
+      p.size( w, h );
       AllPoints.init();
       processing = p;
-      AllPoints.layout( $('#generator-input').val(), w, 520, 600 );
+      AllPoints.layout( $('#generator-input').val(), w, h*0.8, h );
       insertURLVars();
     }
     
@@ -221,11 +222,12 @@ $(document).ready( function() {
    **/
   $('#generator-input').on( 'keyup', function( e ) {
       var val = $(e.currentTarget).val();
-      AllPoints.layout( val, processing.width, 520, 600 );
+      AllPoints.layout( val, processing.width, processing.height*0.8, processing.height );
       updateLocationBar( val );
   }).focus();
 
   $('#save-image').on( 'click', function( e ) {
+    e.preventDefault();
     generateStaticImage();
   });
 
