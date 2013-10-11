@@ -1,36 +1,64 @@
 body {
 	background: rgb( 50, 50, 50 );
+	color: #fff;
 }
+a { color: #fff; }
 
 .generator-main {
 	width: 100%;
+	position: absolute;
+	left: 0;
+}
+
+.generator-main small {
+	font-size: 0.7em;
+}
+
+.generator-language-list, .generator-input-form {
+	width: 80%;
+	position: absolute;
+	left: 10%;
+	padding: 20px;
+	text-align: center;
+}
+
+.generator-input-form {
+	top: 0px;
 }
 
 .generator-language-list {
-	width: 240px;
-	position: absolute;
-	top: 20px;
-	right: 20px;
-	background-color: rgba(255,255,255,0.3);
-	padding: 20px 0 0 20px;
+	bottom: 0px;
+	background-color: rgba(255,255,255,0.1);
 }
 
 #language-list {
 	color: #fff;
 	padding: 0;
-	margin: 20px 0 0 0;
+	margin: 0;
+	text-align: center;
 }
 
 .generator-language-list li {
-	display: block;
-	float: left;
-	width: 100px;
+	display: inline-block;
+	/*float: left;*/
+	/*width: 100px;*/
+	margin-right: 20px;
 	height: 30px;
 	cursor: default;
 }
+.generator-language-list li span {
+	border-bottom: 1px dotted #fff;
+}
 
 #generator-input {
-	width: 220px;
+	width: 40%;
+	margin: 0 auto;
 	margin-bottom: 10px;
-	font-size: 20px;
+	font-size: 30px;
+	font-family: ratio-display,Helvetica,'Helvetica Neue',Arial,sans-serif;
+	background-color: rgba(255,255,255,0.5);
+	border: none;
+	padding: 3px;
+	color: #fff;
+	font-weight: 300;
 }
