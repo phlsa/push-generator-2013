@@ -196,7 +196,6 @@ $(document).ready( function() {
     p.setup = function() {
       var w = $('.generator-main').width();
       p.size( w, 600 );
-      p.background( 250 );
       AllPoints.init();
       processing = p;
       AllPoints.layout( $('#generator-input').val(), w, 520, 600 );
@@ -204,8 +203,7 @@ $(document).ready( function() {
     }
     
     p.draw = function() {
-      ctx.globalCompositeOperation = 'copy';
-      p.background( 50 );
+      ctx.clearRect( 0, 0, p.width, p.height );
       ctx.globalCompositeOperation = 'lighter';
       AllPoints.move();
       drawPoints( p );
