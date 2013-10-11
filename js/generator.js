@@ -188,6 +188,12 @@ var insertURLVars = function() {
 }
 
 
+var generateStaticImage = function() {
+  img = $( Canvas2Image.saveAsPNG( canv, true, processing.width, processing.height ));
+  $( '.image-container' ).append( img );
+}
+
+
 $(document).ready( function() {
   /***
    * Create Processing instance
@@ -218,6 +224,10 @@ $(document).ready( function() {
       AllPoints.layout( val, processing.width, 520, 600 );
       updateLocationBar( val );
   }).focus();
+
+  $('#save-image').on( 'click', function( e ) {
+    generateStaticImage();
+  });
 
   _.each( languageData.languageName, function( item, index ) {
     var elem = $('<li data-index="'+index+'"><span>'+item+'</span></li>');
