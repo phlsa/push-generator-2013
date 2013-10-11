@@ -11,7 +11,7 @@ var processing;
  **/
 var Point = function( x, y, letter ) {
   var self = this;
-  this.x = 1200;
+  this.x = processing.width+100;
   this.y = 300;
   this.destX = x;
   this.destY = y;
@@ -23,7 +23,8 @@ var Point = function( x, y, letter ) {
   }
   this.move = function() {
     var offsetX = processing.noise( self.noiseSeed + (processing.frameCount)/300 ) * 16 - 8;
-    var offsetY = processing.noise( self.noiseSeed*2 + (processing.frameCount)/300 ) * 6 - 3;
+    var offsetY = processing.noise( self.noiseSeed*2 + (processing.frameCount)/100 ) * 6 - 3;
+    offsetY*=.5;
     self.x += (self.destX - self.x) / 5 + offsetX;
     self.y += (self.destY - self.y) / 8 + offsetY;
   }
@@ -50,13 +51,15 @@ var PointSet = function( color ) {
       self.allPoints.push( new Point( arg1, arg2 ) );
     }
   };
-  this.layout = function( text, langIndex, w, h, max, step ) {
+  this.layout = function( text, langIndex, w, h, max, step, sketchHeight ) {
     var counter = 0;
+    step = step*0.8;
+    var offset = w*0.1;
     _.each( text, function( letter, index ) {
       if ( self.get( index ) === undefined ) {
-        self.add( step*index, h/2+getFrequency(letter,langIndex)/max*h/2*(1-(langIndex%2)*2) );
+        self.add( offset+step*index, sketchHeight/2+getFrequency(letter,langIndex)/max*h/2*(1-(langIndex%2)*2) );
       } else {
-        self.get( index ).moveTo( step*index, h/2+getFrequency(letter,langIndex)/max*h/2*(1-(langIndex%2)*2) );
+        self.get( index ).moveTo( offset+step*index, sketchHeight/2+getFrequency(letter,langIndex)/max*h/2*(1-(langIndex%2)*2) );
       }
       counter++;
     });
@@ -71,12 +74,12 @@ var PointSet = function( color ) {
  **/
 var AllPoints = {
   sets: [],
-  layout: function( text, w, h ) {
+  layout: function( text, w, h, sketchHeight ) {
     text = text.toLowerCase();
     var step = w / text.length;
     var max = maxPercentage( text );
     _.each( languageData.languageName, function( name, langIndex ) {
-      AllPoints.sets[langIndex].layout( text, langIndex, w, h, max, step );
+      AllPoints.sets[langIndex].layout( text, langIndex, w, h, max, step, sketchHeight );
     });
   },
   move: function() {
@@ -113,6 +116,7 @@ var drawPoints = function( p ) {
       p.curveVertex( point.x, point.y )
     //  p.ellipse( point.x, point.y, 10, 10 );
     });
+    p.vertex( w, h/2 );
     p.vertex( w, h/2 );
     p.vertex( 0, h/2 );
     p.endShape();
@@ -158,6 +162,31 @@ var maxPercentage = function( text, language ) {
 }
 
 
+var updateLocationBar = function( text ) {
+    text = text.split( ' ' ).join( '_' );
+    url = location.protocol + '//' + location.host + location.pathname + '?push=' + encodeURIComponent( text );
+    rawUrl = location.protocol + '//' + location.host + location.pathname + '?push=' + text;
+    window.history.replaceState( null, "push.generator: " + text, url );
+    $( 'a.fb-share' ).attr( 'href', 'https://www.facebook.com/sharer/sharer.php?u=' + url );
+    $( 'a.tw-share' ).attr( 'href', 'https://twitter.com/share?text=I created something with the push.generator!' );
+}
+var getURLVars = function() {
+  var vars = {}
+  var parts = window.location.href.replace( /[?&]+([^=&]+)=([^&]*)/gi, function( m,key,value ) {
+      vars[key] = value
+  });
+  return vars
+}
+var insertURLVars = function() {
+  if ( window.getURLVars()['push'] && window.getURLVars()['push'] != '' ) {
+    setTimeout( function() {
+    var text = decodeURIComponent( window.getURLVars()['push'] );
+    text = text.split( '_' ).join( ' ' );
+      $( '#generator-input' ).val( text ).trigger( 'keyup' );
+    }, 0 );
+  }
+}
+
 
 $(document).ready( function() {
   /***
@@ -170,12 +199,13 @@ $(document).ready( function() {
       p.background( 250 );
       AllPoints.init();
       processing = p;
-      AllPoints.layout( $('#generator-input').val(), w, 600 );
+      AllPoints.layout( $('#generator-input').val(), w, 520, 600 );
+      insertURLVars();
     }
     
     p.draw = function() {
       ctx.globalCompositeOperation = 'copy';
-      p.background( 51 );
+      p.background( 50 );
       ctx.globalCompositeOperation = 'lighter';
       AllPoints.move();
       drawPoints( p );
@@ -187,11 +217,12 @@ $(document).ready( function() {
    **/
   $('#generator-input').on( 'keyup', function( e ) {
       var val = $(e.currentTarget).val();
-      AllPoints.layout( val, 1200, 600 );
+      AllPoints.layout( val, processing.width, 520, 600 );
+      updateLocationBar( val );
   }).focus();
 
   _.each( languageData.languageName, function( item, index ) {
-    var elem = $('<li data-index="'+index+'">'+item+'</li>');
+    var elem = $('<li data-index="'+index+'"><span>'+item+'</span></li>');
     elem.on( 'mouseenter', function( e ) {
       state.highlight = parseInt( $(e.currentTarget).attr('data-index') );
     }).on( 'mouseleave', function( e ) {
