@@ -6,6 +6,7 @@ var processing;
 
 var startValue = "";
 var nameIndex = 0;
+var seq;
 var Letter = function( cur ) {
   var self = this;
   self.current = cur;
@@ -156,11 +157,11 @@ var PointSet = function( color ) {
   this.get = function( index ) {
     return self.allPoints[index];
   };
-  this.add = function( arg1, arg2 ) {
+  this.add = function( arg1, arg2, arg3 ) {
     if ( arg2 === undefined ) {
       self.allPoints.push( arg1 );
     } else {
-      self.allPoints.push( new Point( arg1, arg2 ) );
+      self.allPoints.push( new Point( arg1, arg2, arg3 ) );
     }
   };
   this.layout = function( text, langIndex, w, h, max, step, sketchHeight ) {
@@ -169,7 +170,7 @@ var PointSet = function( color ) {
     var offset = w*.1;
     _.each( text, function( letter, index ) {
       if ( self.get( index ) === undefined ) {
-        self.add( offset+step*index, sketchHeight/2+getFrequency(letter,langIndex)/max*h/2*(1-(langIndex%2)*2) );
+        self.add( offset+step*index, sketchHeight/2+getFrequency(letter,langIndex)/max*h/2*(1-(langIndex%2)*2), letter );
       } else {
         self.get( index ).moveTo( offset+step*index, sketchHeight/2+getFrequency(letter,langIndex)/max*h/2*(1-(langIndex%2)*2) );
       }
@@ -239,6 +240,15 @@ var drawPoints = function( p, black ) {
     p.vertex( w, h/2 );
     p.vertex( 0, h/2 );
     p.endShape();
+  });
+
+  _.each( AllPoints.sets[0].allPoints, function( point, index ) {
+    if ( seq ) {
+      var font = p.createFont( "Ratio Display Light", 30 );
+      p.textFont( font );
+      p.fill( 255, 255, 255 );
+      p.text( seq.getString()[index], point.x, p.height-40 );
+    }
   });
 }
 
@@ -346,7 +356,8 @@ $(document).ready( function() {
       ctx.clearRect( 0, 0, p.width, p.height );
       ctx.globalCompositeOperation = 'source-over';
       AllPoints.move();
-      drawPoints( p, true );
+    //  drawPoints( p, true );
+      p.background( 50 );
       ctx.globalCompositeOperation = 'lighter';
       drawPoints( p );
     }
@@ -373,7 +384,7 @@ $(document).ready( function() {
 
   $('#iterate-sequence').on( 'click', function( e ) {
     e.preventDefault();
-    var seq = new LetterSequence( startValue );
+    seq = new LetterSequence( startValue );
     seq.substitute( names[nameIndex] );
     $('.generator-input-form, .generator-language-list').hide();
     $('*').css({cursor:'none'});
