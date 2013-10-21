@@ -165,8 +165,8 @@ var PointSet = function( color ) {
   };
   this.layout = function( text, langIndex, w, h, max, step, sketchHeight ) {
     var counter = 0;
-    step = step;
-    var offset = 0;
+    step = step*.8;
+    var offset = w*.1;
     _.each( text, function( letter, index ) {
       if ( self.get( index ) === undefined ) {
         self.add( offset+step*index, sketchHeight/2+getFrequency(letter,langIndex)/max*h/2*(1-(langIndex%2)*2) );
@@ -375,6 +375,8 @@ $(document).ready( function() {
     e.preventDefault();
     var seq = new LetterSequence( startValue );
     seq.substitute( names[nameIndex] );
+    $('.generator-input-form, .generator-language-list').hide();
+    $('*').css({cursor:'none'});
   });
 
   _.each( languageData.languageName, function( item, index ) {
