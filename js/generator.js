@@ -47,10 +47,11 @@ var LetterSequence = function( str ) {
   self.getString = function() {
     var str = "";
     _.each( self.letters, function( l ) {
-      if ( l.get() !== 'NEW' ) {
+      if ( l.get() !== 'NEW' && l.get() !== undefined ) {
         str = str + l.get();
       }
     });
+    console.log( str );
     return str;
   }
 
@@ -60,7 +61,7 @@ var LetterSequence = function( str ) {
     unsubstituted[index].substitute();
     AllPoints.layout( self.getString(), processing.width, processing.height*0.8, processing.height );
     if ( unsubstituted.length > 1 ) {
-      _.delay( self.iterate, 1000 );
+      _.delay( self.iterate, 200 );
     } else {
       console.log( "transformation finished" );
     }
