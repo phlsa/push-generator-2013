@@ -4,24 +4,100 @@ var saveScriptLocation = 'saveImage.php';
 
 var processing;
 
+var Letter = function( cur ) {
+  var self = this;
+  self.current = cur;
+  self.next = "";
+  self.substituted = false;
+
+  self.get = function() {
+    /*if ( self.substituted ) {
+      return self.next;
+    } else {
+      return self.current;
+    }*/
+    return self.current;
+  }
+
+  self.substitute = function() {
+    self.current = self.next;
+    self.substituted = true;
+  }
+}
+
+var LetterSequence = function( str ) {
+  var self = this;
+  self.letters = _.map( str, function( letter ) {
+    return new Letter( letter );
+  });
+
+  self.substitute = function( sub ) {
+    self.sub = sub;
+    // extend the letters array so that new letters can be added
+    while ( self.sub.length > self.letters.length ) {
+      self.letters.push( new Letter( 'NEW' ) );
+    }
+    _.each( self.letters, function( l, i ) {
+      l.substituted = false;
+      l.next = self.sub[i];
+    });
+    self.iterate();
+  }
+
+  self.getString = function() {
+    var str = "";
+    _.each( self.letters, function( l ) {
+      if ( l.get() !== 'NEW' ) {
+        str = str + l.get();
+      }
+    });
+    return str;
+  }
+
+  self.iterate = function() {
+    var unsubstituted = _.where( self.letters, { substituted: false } );
+    var index = Math.floor( Math.random()*unsubstituted.length );
+    unsubstituted[index].substitute();
+    AllPoints.layout( self.getString(), processing.width, processing.height*0.8, processing.height );
+    if ( unsubstituted.length > 1 ) {
+      _.delay( self.iterate, 1000 );
+    } else {
+      console.log( "transformation finished" );
+    }
+  }
+}
+
 var Automate = {
   seq: [],
   generateImageSequence: function() {
     Automate.seq = jQuery.parseJSON( window.prompt() );
     Automate.currentItem = 0;
-    Automate.next();
+    if ( action === 'save' ) {
+      Automate.saveNext();
+    } else {
+      Automate.animateNext();
+    }
   },
-  next: function() {
-    if ( Automate.seq[ Automate.currentItem ] ) {
-      AllPoints.layout( Automate.seq[ Automate.currentItem ], processing.width, processing.height*0.8, processing.height );
-      generateStaticImage( true, Automate.seq[ Automate.currentItem ] );
-      Automate.currentItem++;
+  currentItem: function() {
+    Automate.seq[ Automate._currentItem ]
+  },
+  nextItem: function() {
+    Automate._currentItem++;
+  },
+  saveNext: function() {
+    if ( Automate.currentItem() ) {
+      AllPoints.layout( Automate.currentItem(), processing.width, processing.height*0.8, processing.height );
+      generateStaticImage( true, Automate.currentItem() );
+      Automate.nextItem();
       _.delay( function() {
-        Automate.next();
+        Automate.saveNext();
       }, 1000)
     }
   },
-  currentItem: -1
+  animateNext: function() {
+
+  },
+  _currentItem: -1
 }
 
 var state = {
@@ -281,7 +357,14 @@ $(document).ready( function() {
 
   $('#save-sequence').on( 'click', function( e ) {
     e.preventDefault();
-    Automate.generateImageSequence();
+    Automate.generateImageSequence({ action: 'save' });
+  });
+
+  $('#iterate-sequence').on( 'click', function( e ) {
+    e.preventDefault();
+    var seq = new LetterSequence( $('#generator-input').val() );
+    seq.substitute( window.prompt() );
+    //Automate.generateImageSequence();
   });
 
   _.each( languageData.languageName, function( item, index ) {
