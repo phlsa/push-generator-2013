@@ -4,6 +4,7 @@ var saveScriptLocation = 'saveImage.php';
 
 var processing;
 
+var startValue = "";
 var Letter = function( cur ) {
   var self = this;
   self.current = cur;
@@ -61,8 +62,9 @@ var LetterSequence = function( str ) {
     unsubstituted[index].substitute();
     AllPoints.layout( self.getString(), processing.width, processing.height*0.8, processing.height );
     if ( unsubstituted.length > 1 ) {
-      _.delay( self.iterate, 200 );
+      _.delay( self.iterate, 100 );
     } else {
+      startValue = self.getString();
       console.log( "transformation finished" );
     }
   }
@@ -363,9 +365,8 @@ $(document).ready( function() {
 
   $('#iterate-sequence').on( 'click', function( e ) {
     e.preventDefault();
-    var seq = new LetterSequence( $('#generator-input').val() );
+    var seq = new LetterSequence( startValue );
     seq.substitute( window.prompt() );
-    //Automate.generateImageSequence();
   });
 
   _.each( languageData.languageName, function( item, index ) {
