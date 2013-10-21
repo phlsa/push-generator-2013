@@ -40,13 +40,13 @@ var Point = function( x, y, letter ) {
   this.letter = letter;
   this.noiseSeed = Math.random()*10;
   this.moveTo = function( x, y ) {
-    /*self.destX = x;
-    self.destY = y;*/
-    self.x = x;
-    self.y = y;
+    self.destX = x;
+    self.destY = y;
+    /*self.x = x;
+    self.y = y;*/
   }
   this.move = function() {
-    return;
+    //return;
     var offsetX = processing.noise( self.noiseSeed + (processing.frameCount)/300 ) * 16 - 8;
     var offsetY = processing.noise( self.noiseSeed*2 + (processing.frameCount)/100 ) * 6 - 3;
     offsetY*=.5;
