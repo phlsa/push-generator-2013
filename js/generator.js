@@ -1,10 +1,32 @@
 var canvas = document.getElementById( 'canv' );
 var ctx = canv.getContext( '2d' );
+var saveScriptLocation = 'saveImage.php';
+
+var processing;
+
+var Automate = {
+  seq: [],
+  generateImageSequence: function() {
+    Automate.seq = jQuery.parseJSON( window.prompt() );
+    Automate.currentItem = 0;
+    Automate.next();
+  },
+  next: function() {
+    if ( Automate.seq[ Automate.currentItem ] ) {
+      AllPoints.layout( Automate.seq[ Automate.currentItem ], processing.width, processing.height*0.8, processing.height );
+      generateStaticImage( true, Automate.seq[ Automate.currentItem ] );
+      Automate.currentItem++;
+      _.delay( function() {
+        Automate.next();
+      }, 1000)
+    }
+  },
+  currentItem: -1
+}
 
 var state = {
   highlight: -1,
 }
-var processing;
 
 /***
  * Definition of one point
@@ -18,10 +40,13 @@ var Point = function( x, y, letter ) {
   this.letter = letter;
   this.noiseSeed = Math.random()*10;
   this.moveTo = function( x, y ) {
-    self.destX = x;
-    self.destY = y;
+    /*self.destX = x;
+    self.destY = y;*/
+    self.x = x;
+    self.y = y;
   }
   this.move = function() {
+    return;
     var offsetX = processing.noise( self.noiseSeed + (processing.frameCount)/300 ) * 16 - 8;
     var offsetY = processing.noise( self.noiseSeed*2 + (processing.frameCount)/100 ) * 6 - 3;
     offsetY*=.5;
@@ -53,8 +78,8 @@ var PointSet = function( color ) {
   };
   this.layout = function( text, langIndex, w, h, max, step, sketchHeight ) {
     var counter = 0;
-    step = step*0.8;
-    var offset = w*0.1;
+    step = step;
+    var offset = 0;
     _.each( text, function( letter, index ) {
       if ( self.get( index ) === undefined ) {
         self.add( offset+step*index, sketchHeight/2+getFrequency(letter,langIndex)/max*h/2*(1-(langIndex%2)*2) );
@@ -102,7 +127,7 @@ var drawPoints = function( p, black ) {
       h = p.height;
   _.each( AllPoints.sets, function( set, index ) {
     if ( black ) {
-      p.fill( 50 );
+      p.fill( 75 );
       p.stroke( 50 );
       p.strokeWeight( 1 );
     } else {
@@ -115,6 +140,7 @@ var drawPoints = function( p, black ) {
         p.stroke( 118, 151, 152, 150 );
       }
     }
+    p.noStroke(); // ONLY FOR EXPORTING
     p.beginShape();
     p.vertex( 0, h/2 );
     p.vertex( 0, h/2 );
@@ -167,7 +193,6 @@ var maxPercentage = function( text, language ) {
   }
 }
 
-
 var updateLocationBar = function( text ) {
     text = text.split( ' ' ).join( '_' );
     url = location.protocol + '//' + location.host + location.pathname + '?push=' + encodeURIComponent( text );
@@ -194,9 +219,24 @@ var insertURLVars = function() {
 }
 
 
-var generateStaticImage = function() {
-  img = $( Canvas2Image.saveAsPNG( canv, true, processing.width, processing.height ));
-  $( '.image-container' ).append( img );
+var generateStaticImage = function( saveToDisk, imageName ) {
+  var name = imageName;
+  if ( name === undefined ) {
+    name = $( '#generator-input' ).val()
+  }
+  if ( saveToDisk ) {
+    var imageStr = canv.toDataURL( 'image/png' );
+    var dataStr = imageStr.substring( 22 );
+    $.post( saveScriptLocation, {
+      'data': dataStr,
+      'name': name,
+    }, function( data ) {
+      console.log( data );
+    });
+  } else {
+    var img = $( Canvas2Image.saveAsPNG( canv, true, processing.width, processing.height ));
+    $( '.image-container' ).append( img );
+  }
 }
 
 
@@ -236,7 +276,12 @@ $(document).ready( function() {
 
   $('#save-image').on( 'click', function( e ) {
     e.preventDefault();
-    generateStaticImage();
+    generateStaticImage( true );
+  });
+
+  $('#save-sequence').on( 'click', function( e ) {
+    e.preventDefault();
+    Automate.generateImageSequence();
   });
 
   _.each( languageData.languageName, function( item, index ) {
