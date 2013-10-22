@@ -42,18 +42,18 @@ var Point = function( x, y, letter ) {
   this.letter = letter;
   this.noiseSeed = Math.random()*10;
   this.moveTo = function( x, y ) {
-    /*self.destX = x;
-    self.destY = y;*/
+    self.destX = x;
+    self.destY = y;
     self.x = x;
     self.y = y;
   }
   this.move = function() {
-    return;
-    var offsetX = processing.noise( self.noiseSeed + (processing.frameCount)/300 ) * 16 - 8;
-    var offsetY = processing.noise( self.noiseSeed*2 + (processing.frameCount)/100 ) * 6 - 3;
+    //return;
+    var offsetX = 0;//processing.noise( self.noiseSeed + (processing.frameCount)/300 ) * 16 - 8;
+    var offsetY = 0;//processing.noise( self.noiseSeed*2 + (processing.frameCount)/100 ) * 6 - 3;
     offsetY*=.5;
-    self.x += (self.destX - self.x) / 5 + offsetX;
-    self.y += (self.destY - self.y) / 8 + offsetY;
+    self.x += (self.destX - self.x) + offsetX;
+    self.y += (self.destY - self.y) + offsetY;
   }
 }
 
@@ -80,8 +80,8 @@ var PointSet = function( color ) {
   };
   this.layout = function( text, langIndex, w, h, max, step, sketchHeight ) {
     var counter = 0;
-    step = step*0.8;
-    var offset = w*0.1;
+    step = step*.8;
+    var offset = w*.1;
     _.each( text, function( letter, index ) {
       if ( self.get( index ) === undefined ) {
         self.add( offset+step*index, sketchHeight/2+getFrequency(letter,langIndex)/max*h/2*(1-(langIndex%2)*2) );
