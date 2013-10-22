@@ -14,11 +14,13 @@ var Automate = {
   next: function() {
     if ( Automate.seq[ Automate.currentItem ] ) {
       AllPoints.layout( Automate.seq[ Automate.currentItem ], processing.width, processing.height*0.8, processing.height );
-      generateStaticImage( true, Automate.seq[ Automate.currentItem ] );
-      Automate.currentItem++;
-      _.delay( function() {
-        Automate.next();
-      }, 1000)
+      _.defer( function() {
+        generateStaticImage( true, Automate.seq[ Automate.currentItem ] );
+        Automate.currentItem++;
+        _.delay( function() {
+          Automate.next();
+        }, 1000);        
+      })
     }
   },
   currentItem: -1
@@ -78,8 +80,8 @@ var PointSet = function( color ) {
   };
   this.layout = function( text, langIndex, w, h, max, step, sketchHeight ) {
     var counter = 0;
-    step = step;
-    var offset = 0;
+    step = step*0.8;
+    var offset = w*0.1;
     _.each( text, function( letter, index ) {
       if ( self.get( index ) === undefined ) {
         self.add( offset+step*index, sketchHeight/2+getFrequency(letter,langIndex)/max*h/2*(1-(langIndex%2)*2) );
